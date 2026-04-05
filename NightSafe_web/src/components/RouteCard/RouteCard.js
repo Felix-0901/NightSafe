@@ -5,7 +5,7 @@ import { Clock, DollarSign, Footprints, Map, Sparkles, AlertTriangle, Bookmark, 
 import NightScore from '../NightScore/NightScore';
 import styles from './RouteCard.module.css';
 
-export default function RouteCard({ route, index, recommended = false }) {
+export default function RouteCard({ route, index, recommended = false, detailHref }) {
   const tagColorClass = {
     green: styles.green,
     cyan: styles.cyan,
@@ -96,7 +96,7 @@ export default function RouteCard({ route, index, recommended = false }) {
           <button className="btn btn-ghost btn-sm" aria-label="收藏此路線">
             <Bookmark size={16} />
           </button>
-          <Link href={`/detail?route=${route.id}`} className="btn btn-primary btn-sm">
+          <Link href={detailHref || `/detail?route=${route.id}`} className="btn btn-primary btn-sm">
             查看詳情
             <ArrowRight size={14} />
           </Link>

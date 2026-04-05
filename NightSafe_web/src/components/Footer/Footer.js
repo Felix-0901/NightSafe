@@ -15,7 +15,7 @@ export default function Footer() {
               <span>NightSafe</span>
             </div>
             <p className={styles.brandDesc}>
-              AI 夜間移動建議平台。整合台北市開放資料與即時交通資訊，幫助使用者在夜間做出更好的移動決策。
+              夜間移動分析平台。整合台北市官方開放資料與即時交通資訊，幫助使用者在夜間做出更好的移動決策。
             </p>
           </div>
 
@@ -24,7 +24,7 @@ export default function Footer() {
             <Link href="/plan" className={styles.footerLink}>路線規劃</Link>
             <Link href="/map" className={styles.footerLink}>地圖探索</Link>
             <Link href="/results" className={styles.footerLink}>方案比較</Link>
-            <Link href="/saved" className={styles.footerLink}>收藏路線</Link>
+            <Link href="/about" className={styles.footerLink}>資料來源</Link>
           </div>
 
           <div className={styles.footerSection}>
@@ -42,16 +42,16 @@ export default function Footer() {
             </a>
             <span className={styles.footerLink}>YouBike 2.0 即時資訊</span>
             <span className={styles.footerLink}>路燈位置分布圖</span>
-            <span className={styles.footerLink}>CCTV 設施資料</span>
+            <span className={styles.footerLink}>捷運出入口 / 公車到站 / CCTV / 派出所</span>
           </div>
         </div>
 
         <div className={styles.footerBottom}>
           <p className={styles.copyright}>
-            © 2026 NightSafe — YTP 高中組參賽作品
+            © 2026 NightSafe. All rights reserved.
           </p>
           <p className={styles.disclaimer}>
-            本平台為夜間移動決策輔助工具，不保證絕對安全。資料來源為台北市政府開放資料平臺。
+            本平台為夜間移動決策輔助工具，不保證絕對安全。資料來源以台北市政府官方開放資料為主。
           </p>
         </div>
       </div>

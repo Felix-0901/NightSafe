@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, Menu, X } from 'lucide-react';
+import { Shield, Menu, X, Sparkles } from 'lucide-react';
 import styles from './Navbar.module.css';
 
 const navItems = [
@@ -25,10 +25,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
   return (
     <>
       <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
@@ -45,6 +41,7 @@ export default function Navbar() {
               key={item.href}
               href={item.href}
               className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
+              onClick={() => setMobileOpen(false)}
             >
               {item.label}
             </Link>
@@ -52,8 +49,9 @@ export default function Navbar() {
         </div>
 
         <div className={styles.ctaButton}>
-          <Link href="/plan" className="btn btn-primary btn-sm">
-            開始規劃
+          <Link href="/plan" className="btn btn-primary btn-sm" onClick={() => setMobileOpen(false)}>
+            <Sparkles size={14} />
+            開始分析
           </Link>
         </div>
 
@@ -72,12 +70,14 @@ export default function Navbar() {
             key={item.href}
             href={item.href}
             className={`${styles.mobileNavLink} ${pathname === item.href ? styles.active : ''}`}
+            onClick={() => setMobileOpen(false)}
           >
             {item.label}
           </Link>
         ))}
-        <Link href="/plan" className="btn btn-primary" style={{ marginTop: '8px' }}>
-          開始規劃
+        <Link href="/plan" className="btn btn-primary" style={{ marginTop: '8px' }} onClick={() => setMobileOpen(false)}>
+          <Sparkles size={14} />
+          開始分析
         </Link>
       </div>
     </>

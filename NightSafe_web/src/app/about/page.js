@@ -1,14 +1,15 @@
 import {
   Shield, Database, AlertTriangle, Users, Code, Brain,
-  Lightbulb, Bike, Camera, Bus, CheckCircle, Target
+  CheckCircle, Target
 } from 'lucide-react';
 import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
+import { publicDataCatalog } from '@/data/publicDataCatalog';
 import styles from '../pages.module.css';
 
 export const metadata = {
-  title: '關於 NightSafe — AI 夜間移動建議平台',
-  description: '了解 NightSafe 的理念、資料來源、技術架構與團隊。',
+  title: '關於 NightSafe — 雙北夜間安全路徑決策系統',
+  description: '了解 NightSafe v2 的資料來源、路徑引擎、評分模型與產品定位。',
 };
 
 export default function AboutPage() {
@@ -27,8 +28,8 @@ export default function AboutPage() {
             <span className="gradient-text">更安心的選擇</span>
           </h1>
           <p className={styles.pageDesc} style={{ maxWidth: 600 }}>
-            NightSafe 是一個以 Web 為核心的 AI 夜間移動建議平台。我們整合台北市開放資料與即時交通資訊，
-            幫助使用者在夜間做出更好的移動決策。
+            NightSafe v2 是一個以雙北真實路徑與官方資料為核心的夜間安全路徑決策系統。
+            我們把地理編碼、OSRM 路線、雙北開放資料與環境訊號整合成可解釋的夜間移動建議。
           </p>
         </div>
 
@@ -40,13 +41,13 @@ export default function AboutPage() {
               專案定位
             </h3>
             <div className={styles.aboutCardContent}>
-              <p>NightSafe 是一個為夜間外出者提供 AI 夜間移動決策輔助的平台。</p>
+              <p>NightSafe 是一個為夜間外出者提供資料驅動夜間路徑判讀的平台。</p>
               <ul>
-                <li>更安心：提供夜間友善路線與移動策略</li>
+                <li>更真實：真實地理編碼與 OSRM 路線，不再只畫假軌跡</li>
                 <li>更清楚：把複雜的交通與環境資訊變成能理解的建議</li>
-                <li>更彈性：不只一條路，而是多種夜間方案比較</li>
-                <li>更即時：結合即時站點與交通資料</li>
-                <li>更落地：以台北真實開放資料為基礎</li>
+                <li>更彈性：保留最快、夜間友善、低成本三種候選方案</li>
+                <li>更即時：YouBike、天氣、空品與施工訊號可即時修正</li>
+                <li>更落地：以雙北與中央機關開放資料為基礎</li>
               </ul>
             </div>
           </div>
@@ -75,13 +76,11 @@ export default function AboutPage() {
               資料來源
             </h3>
             <div className={styles.aboutCardContent}>
-              <p>所有資料來自台北市政府開放資料平臺：</p>
+              <p>目前分析框架已納入雙北與中央開放資料：</p>
               <ul>
-                <li>路燈位置分布圖 — 照明密度與覆蓋分析</li>
-                <li>YouBike 2.0 即時資訊 — 站點可借車數與空位</li>
-                <li>警察局名稱及地址 — 派出所安全錨點</li>
-                <li>CCTV 設施資料 — 攝影機位置座標</li>
-                <li>公車路線軌跡 — 備援交通切換設計</li>
+                {publicDataCatalog.slice(0, 10).map((source) => (
+                  <li key={source.id}>{source.name} — {source.analysisUse}</li>
+                ))}
               </ul>
             </div>
           </div>
@@ -92,13 +91,14 @@ export default function AboutPage() {
               夜間友善分數
             </h3>
             <div className={styles.aboutCardContent}>
-              <p>每條路線的 Night Mobility Score 由五項指標計算：</p>
+              <p>每條路線的 NightSafe Score 由六組可解釋權重計算：</p>
               <ul>
-                <li>照明分數 (30%) — 路燈密度與間距</li>
-                <li>安心錨點 (20%) — 派出所、CCTV 鄰近程度</li>
-                <li>交通可用性 (20%) — 可切換的交通工具</li>
-                <li>主要道路 (15%) — 是否走幹道</li>
-                <li>步行暴露 (15%) — 純步行時間長短</li>
+                <li>照明與可視性 (25%) — 路燈密度、亮區與 CCTV 覆蓋</li>
+                <li>安心錨點 (15%) — 警消醫療與停留節點密度</li>
+                <li>交通連續性 (20%) — 交通模式在當前時段的可用性</li>
+                <li>步行暴露 (20%) — 純步行時間與長度</li>
+                <li>事故 / 施工風險 (10%) — 施工與歷史事故修正</li>
+                <li>天氣 / AQI 修正 (10%) — 下雨與空品對夜間移動的影響</li>
               </ul>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function AboutPage() {
             NightSafe 是一個夜間移動決策輔助工具，不保證絕對安全。開放資料更新頻率有限，
             CCTV、派出所、路燈只能作為輔助指標。夜間人流與治安是動態因素，本平台不做即時風險預測。
             我們使用「夜間友善」而非「絕對安全」措辭，提供多方案比較降低誤導，並保留人工判斷空間。
-            所有資料來源為台北市政府開放資料平臺。
+            所有資料來源以雙北政府開放資料、中央氣象署與環境部公開資料為主。
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function AboutPage() {
             <h2 style={{ marginBottom: 'var(--space-sm)' }}>
               <span className="gradient-text">團隊成員</span>
             </h2>
-            <p style={{ color: 'var(--color-text-muted)' }}>YTP 2026 高中組參賽團隊</p>
+            <p style={{ color: 'var(--color-text-muted)' }}>NightSafe 開發團隊</p>
           </div>
 
           <div className={styles.teamGrid}>
@@ -149,7 +149,7 @@ export default function AboutPage() {
             <h2 style={{ marginBottom: 'var(--space-sm)' }}>
               <span className="gradient-text">技術架構</span>
             </h2>
-            <p style={{ color: 'var(--color-text-muted)' }}>三層式 AI 推薦架構</p>
+            <p style={{ color: 'var(--color-text-muted)' }}>資料聚合層 + 路徑引擎 + 評分模型 + AI 解釋層</p>
           </div>
 
           <div className={styles.archDiagram}>
@@ -163,61 +163,61 @@ export default function AboutPage() {
               </div>
             </div>
             <div className={styles.archLayer} style={{ borderColor: 'rgba(6, 182, 212, 0.3)' }}>
-              <div className={styles.archLayerTitle} style={{ color: 'var(--color-cyan)' }}>資料計算層</div>
+              <div className={styles.archLayerTitle} style={{ color: 'var(--color-cyan)' }}>資料聚合層</div>
               <div className={styles.archLayerItems}>
-                路燈密度計算<br />
-                站點距離分析<br />
-                步行比例<br />
-                安心錨點覆蓋
+                路燈 / CCTV / 警政<br />
+                醫療 / 廁所 / 避難<br />
+                天氣 / AQI / 施工<br />
+                bbox 圖層查詢
               </div>
             </div>
             <div className={styles.archLayer} style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
-              <div className={styles.archLayerTitle} style={{ color: 'var(--color-amber)' }}>評分模型層</div>
+              <div className={styles.archLayerTitle} style={{ color: 'var(--color-amber)' }}>路徑與評分層</div>
               <div className={styles.archLayerItems}>
-                Night Mobility Score<br />
-                多指標加權<br />
-                路線排序<br />
-                替代方案生成
+                Nominatim 地理編碼<br />
+                OSRM 候選路線<br />
+                分段風險評分<br />
+                多方案排序
               </div>
             </div>
             <div className={styles.archLayer} style={{ borderColor: 'rgba(168, 85, 247, 0.3)' }}>
               <div className={styles.archLayerTitle} style={{ color: 'var(--color-purple)' }}>AI 說明層</div>
               <div className={styles.archLayerItems}>
                 LLM API<br />
-                白話解釋<br />
+                結果解釋<br />
                 行前提醒<br />
-                替代方案說明
+                備援方案說明
               </div>
             </div>
           </div>
         </div>
 
-        {/* YTP Alignment */}
+        {/* Vision */}
         <div style={{ marginBottom: 'var(--space-3xl)' }}>
           <div style={{ textAlign: 'center', marginBottom: 'var(--space-2xl)' }}>
             <h2 style={{ marginBottom: 'var(--space-sm)' }}>
-              <span className="gradient-text">YTP 2026 主題對應</span>
+              <span className="gradient-text">我們的願景</span>
             </h2>
-            <p style={{ color: 'var(--color-text-muted)' }}>用 AI 翻轉城市樣貌</p>
+            <p style={{ color: 'var(--color-text-muted)' }}>用 AI 翻轉城市夜間移動體驗</p>
           </div>
 
           <div className={styles.aboutGrid}>
             <div className={styles.aboutCard} style={{ borderColor: 'rgba(34, 197, 94, 0.3)' }}>
               <h3 className={styles.aboutCardTitle}>
                 <CheckCircle size={20} style={{ color: 'var(--color-cta)' }} />
-                行善台北
+                更安心的城市
               </h3>
               <div className={styles.aboutCardContent}>
-                <p>改善市民，尤其青年夜間移動時的安心感與可近性。提升夜間交通決策品質，展現開放資料的實際應用。</p>
+                <p>改善市民，尤其青年夜間移動時的安心感與可近性。提升夜間交通決策品質，展現開放資料的實際應用價值。</p>
               </div>
             </div>
             <div className={styles.aboutCard} style={{ borderColor: 'rgba(6, 182, 212, 0.3)' }}>
               <h3 className={styles.aboutCardTitle}>
                 <CheckCircle size={20} style={{ color: 'var(--color-cyan)' }} />
-                行旅台北
+                更友善的夜間
               </h3>
               <div className={styles.aboutCardContent}>
-                <p>夜間移動建議對晚間活動、觀光、演唱會散場、夜市移動、陌生地區返程都很有用。讓台北的夜間移動更友善。</p>
+                <p>無論是晚間活動、觀光、演唱會散場、夜市移動，還是陌生地區返程，都能透過 NightSafe 找到更好的移動方案。</p>
               </div>
             </div>
           </div>

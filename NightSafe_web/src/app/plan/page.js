@@ -1,48 +1,49 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
-  MapPin, Clock, Sparkles, ArrowRight, Navigation,
+  MapPin, Clock, Sparkles, Navigation,
   Lightbulb, Footprints, Route, Zap, Wallet, ArrowRightLeft,
-  Users, Bus
+  Users, Bus, Database, Shield
 } from 'lucide-react';
 import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
+import { preferenceOptions, getScenarioPreset } from '@/data/planningOptions';
+import { publicDataCatalog } from '@/data/publicDataCatalog';
+import { serializePlannerState } from '@/lib/nightSafeEngine';
 import styles from '../pages.module.css';
 
 const iconMap = {
   Lightbulb, Footprints, Route, Zap, Wallet, ArrowRightLeft, Users, Bus,
 };
 
-const preferenceOptions = [
-  { id: 'bright-route', label: '路燈多', icon: 'Lightbulb' },
-  { id: 'less-walking', label: '少走路', icon: 'Footprints' },
-  { id: 'main-road', label: '走大路', icon: 'Route' },
-  { id: 'fastest', label: '最快到達', icon: 'Zap' },
-  { id: 'cheapest', label: '最省錢', icon: 'Wallet' },
-  { id: 'less-transfer', label: '少轉乘', icon: 'ArrowRightLeft' },
-  { id: 'crowded-route', label: '人多的路', icon: 'Users' },
-  { id: 'public-transit', label: '大眾運輸', icon: 'Bus' },
-];
-
 function PlanContent() {
   const searchParams = useSearchParams();
-  const scenario = searchParams.get('scenario');
-  const initialQuery = searchParams.get('q') || '';
+  const scenario = searchParams.get('scenario') || '';
+  const preset = getScenarioPreset(scenario);
 
-  const [from, setFrom] = useState(scenario === 'study' ? '南陽街補習班' : '');
-  const [to, setTo] = useState(scenario === 'study' ? '景美站' : '');
-  const [time, setTime] = useState('21:30');
-  const [prefs, setPrefs] = useState(scenario === 'study' ? ['bright-route', 'less-walking'] : []);
-  const [nlQuery, setNlQuery] = useState(initialQuery);
+  const [from, setFrom] = useState(preset?.from || searchParams.get('from') || '台北車站');
+  const [to, setTo] = useState(preset?.to || searchParams.get('to') || '永春站');
+  const [time, setTime] = useState(preset?.time || searchParams.get('time') || '21:30');
+  const [prefs, setPrefs] = useState(preset?.prefs || ['bright-route', 'main-road']);
+
+  const href = useMemo(() => `/results?${serializePlannerState({
+    from,
+    to,
+    time,
+    prefs,
+    scenario,
+  })}`, [from, prefs, scenario, time, to]);
 
   const togglePref = (id) => {
     setPrefs((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((pref) => pref !== id) : [...prev, id],
     );
   };
+
+  const sourcePreview = publicDataCatalog.slice(0, 6);
 
   return (
     <div className={`container ${styles.pageContainer}`}>
@@ -51,13 +52,12 @@ function PlanContent() {
           <Navigation size={14} />
           路線規劃
         </div>
-        <h1 className={styles.pageTitle}>規劃你的夜間路線</h1>
-        <p className={styles.pageDesc}>輸入起終點與偏好，AI 將為你推薦最適合的夜間移動方案</p>
+        <h1 className={styles.pageTitle}>設定今晚的移動條件</h1>
+        <p className={styles.pageDesc}>NightSafe 會依起點、終點、出發時間與偏好，套用官方資料與即時交通摘要後再做分析</p>
       </div>
 
       <div className={styles.planGrid}>
         <div className={styles.planForm}>
-          {/* From */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
               <MapPin size={16} style={{ color: 'var(--color-cta)' }} />
@@ -67,7 +67,7 @@ function PlanContent() {
               <span className={styles.inputIcon}><Navigation size={16} /></span>
               <input
                 className="input"
-                placeholder="輸入起點或使用目前位置"
+                placeholder="輸入起點或目前位置"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
                 style={{ paddingLeft: 42 }}
@@ -75,7 +75,6 @@ function PlanContent() {
             </div>
           </div>
 
-          {/* To */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
               <MapPin size={16} style={{ color: 'var(--color-rose)' }} />
@@ -93,7 +92,6 @@ function PlanContent() {
             </div>
           </div>
 
-          {/* Time */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
               <Clock size={16} style={{ color: 'var(--color-amber)' }} />
@@ -107,58 +105,54 @@ function PlanContent() {
             />
           </div>
 
-          {/* Preferences */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
               <Sparkles size={16} style={{ color: 'var(--color-purple)' }} />
               偏好條件
             </label>
             <div className={styles.prefTags}>
-              {preferenceOptions.map((opt) => {
-                const Icon = iconMap[opt.icon];
+              {preferenceOptions.map((option) => {
+                const Icon = iconMap[option.icon];
                 return (
                   <button
-                    key={opt.id}
-                    className={`${styles.prefTag} ${prefs.includes(opt.id) ? styles.active : ''}`}
-                    onClick={() => togglePref(opt.id)}
+                    key={option.id}
                     type="button"
+                    className={`${styles.prefTag} ${prefs.includes(option.id) ? styles.active : ''}`}
+                    onClick={() => togglePref(option.id)}
                   >
                     <Icon size={14} />
-                    {opt.label}
+                    {option.label}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Natural Language */}
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              <Sparkles size={16} style={{ color: 'var(--color-cta)' }} />
-              或用自然語言描述
-            </label>
-            <textarea
-              className={styles.nlInput}
-              placeholder="例如：演唱會結束要回景美，不想走太暗的地方，希望少轉乘..."
-              value={nlQuery}
-              onChange={(e) => setNlQuery(e.target.value)}
-            />
+          <div className={styles.analysisNotice}>
+            <div className={styles.analysisNoticeHeader}>
+              <Database size={18} style={{ color: 'var(--color-cta)' }} />
+              這次會一起納入的資料類型
+            </div>
+            <div className={styles.analysisSourceGrid}>
+              {sourcePreview.map((source) => (
+                <div key={source.id} className={styles.analysisSourceItem}>
+                  <span className={styles.analysisSourceName}>{source.name}</span>
+                  <span className={styles.analysisSourceDesc}>{source.analysisUse}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <Link
-            href={`/results?from=${encodeURIComponent(from || '台北車站')}&to=${encodeURIComponent(to || '永春站')}&time=${time}`}
-            className={`btn btn-primary btn-lg ${styles.submitBtn}`}
-          >
+          <Link href={href} className={`btn btn-primary btn-lg ${styles.submitBtn}`}>
             <Sparkles size={18} />
-            取得 AI 建議
+            取得分析結果
           </Link>
         </div>
 
-        {/* Preview Sidebar */}
         <div className={styles.planPreview}>
           <div className={styles.previewTitle}>
-            <Sparkles size={18} style={{ color: 'var(--color-cta)' }} />
-            規劃摘要
+            <Shield size={18} style={{ color: 'var(--color-cta)' }} />
+            分析摘要
           </div>
 
           <div className={styles.previewItem}>
@@ -177,18 +171,19 @@ function PlanContent() {
             <span className={styles.previewItemLabel}>偏好</span>
             <span className={styles.previewItemValue}>
               {prefs.length > 0
-                ? prefs.map((p) => preferenceOptions.find((o) => o.id === p)?.label).join('、')
-                : '未設定'
-              }
+                ? prefs.map((pref) => preferenceOptions.find((option) => option.id === pref)?.label).join('、')
+                : '未設定'}
             </span>
           </div>
 
-          {nlQuery && (
-            <div style={{ padding: 'var(--space-md)', background: 'var(--color-surface-raised)', borderRadius: 'var(--radius-md)' }}>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-dim)', marginBottom: 4 }}>自然語言描述</p>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>{nlQuery}</p>
-            </div>
-          )}
+          <div className={styles.previewInsightBox}>
+            <p className={styles.previewInsightTitle}>系統怎麼判讀</p>
+            <ul className={styles.previewInsightList}>
+              <li>照明與主幹道資料會影響最後一段步行風險</li>
+              <li>捷運末班、公車班距與 YouBike 即時供給會影響交通排序</li>
+              <li>派出所、CCTV、消防與醫療據點會拉高夜間友善度</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NightSafe Web
 
-## Getting Started
+NightSafe 是一個以台北市官方開放資料為核心的夜間移動分析平台。使用者只需要設定起點、終點、出發時間與偏好，系統就會把照明、交通供給、安心錨點與求助資源整理成結構化條件，再交由 AI 生成白話分析。
 
-First, run the development server:
+## 本次調整重點
+
+- 移除聊天式 AI 助手頁面，改成純設定導向流程
+- 首頁與 `/plan` 都改成起點 / 終點 / 時間 / 偏好輸入
+- `/results` 改成使用分析引擎動態生成方案，不再直接吃固定 mock
+- 地圖標註改成更亮的白色系處理，提升道路文字可讀性
+- 補進更多官方資料目錄，擴大夜間友善判讀依據
+
+## 開發啟動
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+預設網址：
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 環境變數
 
-## Learn More
+已建立：
 
-To learn more about Next.js, take a look at the following resources:
+- `./.env.local`
+- `./.env.local.example`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+把你的 key 貼到：
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```dotenv
+NIGHTSAFE_AI_API_KEY=your-real-key
+```
 
-## Deploy on Vercel
+NightSafe 目前預設用下列參數呼叫 `free_chatgpt_api`：
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```dotenv
+NIGHTSAFE_AI_BASE_URL=https://free.v36.cm/v1
+NIGHTSAFE_AI_MODEL=gpt-4o-mini
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+如果之後要切換端點，只需要改 `.env.local`。
+
+## 目前納入的官方資料方向
+
+已整理進分析框架的資料包含：
+
+- 路燈位置分布圖
+- YouBike2.0 臺北市公共自行車即時資訊
+- 警察局名稱及地址
+- 臺北市 CCTV 設施
+- 臺北捷運車站出入口座標
+- 臺北捷運各站分時進出量統計
+- 臺北市公車預估到站時間
+- 臺北市公廁點位資訊
+- 臺北市性別友善廁所點位資訊
+- 消防分隊駐地位置及聯絡資訊
+- 臺北市 AED 自動體外心臟去顫器設置地點
+- 臺北市急救責任醫院
+- 臺北市防空避難設備位置
+- 街頭隨機強盜 / 搶奪案件點位資訊
+
+## AI 使用方式
+
+NightSafe 的 AI 不提供自由聊天。它只負責：
+
+- 解釋多方案比較結果
+- 根據官方資料摘要補上決策理由
+- 產生行前提醒與備援建議
+
+真正的排序與分數主要由網站的資料分析邏輯決定。
+
+## 注意事項
+
+- 本平台為夜間移動決策輔助工具，不做絕對安全保證
+- 官方資料更新頻率不一，即時狀況仍需以現場為準
+- 深夜時段若大眾運輸停駛，系統會自動拉高備援方案權重
